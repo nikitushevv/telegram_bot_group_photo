@@ -33,7 +33,19 @@ jobs:
           # Пример, если есть тесты:
           # pytest
 
-      # 5. Деплой на сервер по SSH (git pull, обновление зависимостей, рестарт systemd)
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: echo "SSH connection successful!"
+          
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -41,15 +53,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # Переходим в директорию с проектом
-            cd /home/telegram-bot/home/bot
-
-            # Делаем git pull (если репозиторий уже склонирован на сервере)
-            # Или, если не клонировали репозиторий на сервер, можно использовать scp-action (см. ниже)
+            cd /home/telegram-bot-photo/bot
             git pull origin main
-
-            # Пересобираем контейнер докера
             docker build -t telegram-bot-photo .
-
-            # Перезаупскаем контейнер докера
-            docker run -d -p 8080:8080 telegram-bot-photo
+            docker stop bot-container || true
+            docker rm bot-container || true
+            docker run -d --name bot-container -p 8080:8080 telegram-bot-photo
+        
