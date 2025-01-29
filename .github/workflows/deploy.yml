@@ -53,7 +53,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/telegram-bot-photo/bot
+            cd /home/telegram-bot-photo/home/bot
             git pull origin main
             docker build -t telegram-bot-photo .
             docker stop bot-container || true
