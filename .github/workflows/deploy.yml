@@ -53,10 +53,14 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            git config --global --add safe.directory /home/telegram-bot-photo/bot
             cd /home/telegram-bot-photo/home/bot
             git pull origin main
             docker build -t telegram-bot-photo .
+            
+            # Останавливаем и удаляем старый контейнер (если есть)
             docker stop bot-container || true
             docker rm bot-container || true
+            # Запускаем новый контейнер
             docker run -d --name bot-container -p 8080:8080 telegram-bot-photo
         
