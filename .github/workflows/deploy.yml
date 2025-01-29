@@ -53,7 +53,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            git config --global --add safe.directory /home/telegram-bot-photo/bot
+            git config --global --add safe.directory /home/telegram-bot-photo/home/bot
             cd /home/telegram-bot-photo/home/bot
             git pull origin main
             docker build -t telegram-bot-photo .
